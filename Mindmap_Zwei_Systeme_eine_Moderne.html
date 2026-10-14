@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zwei Systeme, eine Moderne?</title>
+<style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Karte als Plan – x = Region (Westen · Deutschland · DDR · UdSSR), y = Zeit (1920–35 · 1935–55 · 1955–90); Detailtafel rechts, Gegenüberstellungen darunter */
+:root{
+  --paper:#eceeeb; --sheet:#f7f8f6; --ink:#1b1d1f; --muted:#5c6264; --rule:#c9cdca;
+  --west:#2f5f8a; --brd:#3a3f44; --ddr:#a5711b; --ussr:#b8322a;
+  --node:#ffffff; --dim:.16;
+  --f-display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#16181a; --sheet:#1e2124; --ink:#e7e9e6; --muted:#9aa19f; --rule:#353a3d;
+  --west:#7fb0dc; --brd:#b9c0c4; --ddr:#e0a54a; --ussr:#f0786d; --node:#25292c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#16181a; --sheet:#1e2124; --ink:#e7e9e6; --muted:#9aa19f; --rule:#353a3d;
+  --west:#7fb0dc; --brd:#b9c0c4; --ddr:#e0a54a; --ussr:#f0786d; --node:#25292c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding-inline:20px;padding-block:28px 56px}
+header{display:grid;gap:10px;margin-bottom:22px;max-width:900px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-variation-settings:"wdth" 115;font-weight:800;font-size:clamp(28px,4.2vw,50px);line-height:1.02;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--ussr)}
+.lede{margin:0;color:var(--muted);max-width:68ch}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 14px}
+.controls .lbl{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:4px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);font:500 13px var(--f-body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="false"]{opacity:.45}
+.chip:focus-visible,.node:focus-visible,.card:focus-visible,button:focus-visible{outline:2px solid var(--ussr);outline-offset:2px}
+.chip svg{width:26px;height:8px}
+.reset{margin-left:auto}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+@media (max-width:1060px){.layout{grid-template-columns:minmax(0,1fr)}}
+.mapbox{background:var(--sheet);border:1px solid var(--rule);overflow-x:auto;min-width:0}
+.mapbox svg{display:block;width:100%;min-width:1080px;height:auto}
+.panel{background:var(--sheet);border:1px solid var(--rule);padding:18px 18px 20px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:grid;gap:12px;min-width:0}
+@media (max-width:1060px){.panel{position:static}}
+.panel h2{font-family:var(--f-display);font-variation-settings:"wdth" 105;font-weight:750;font-size:22px;line-height:1.15;margin:0;text-wrap:balance}
+.panel .meta{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 12px}
+.panel p{margin:0}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border:1px solid currentColor;border-radius:3px}
+.rels{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.rels li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;font-size:14px}
+.rels button{all:unset;cursor:pointer;font-weight:600;border-bottom:1px solid var(--rule)}
+.rels button:hover{border-color:var(--ink)}
+.rels svg{width:28px;height:10px;margin-top:6px}
+.small{font-size:13px;color:var(--muted)}
+.folder{font-family:var(--f-mono);font-size:12px;background:var(--paper);border:1px solid var(--rule);padding:6px 8px;border-radius:3px;overflow-wrap:anywhere}
+section.block{margin-top:40px}
+section.block h3{font-family:var(--f-display);font-variation-settings:"wdth" 110;font-weight:780;font-size:24px;margin:0 0 6px}
+section.block > p{margin:0 0 16px;color:var(--muted);max-width:72ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.card{background:var(--sheet);border:1px solid var(--rule);padding:14px 16px;display:grid;gap:8px;cursor:pointer;text-align:left;color:var(--ink);font:inherit}
+.card:hover{border-color:var(--muted)}
+.card .pair{font-weight:700;font-size:15px;line-height:1.3}
+.card .pair span{color:var(--muted);font-weight:400}
+.card .q{font-size:14px}
+.card .src{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.srcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px 24px;margin:0;padding:0;list-style:none}
+.srcs li{border-top:1px solid var(--rule);padding-top:8px;font-size:14px}
+.srcs a{color:var(--ink);font-weight:600}
+.srcs .small{display:block}
+.note{margin-top:18px;font-size:13px;color:var(--muted);max-width:80ch}
+/* SVG */
+.band-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.era-label{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted)}
+.edge{fill:none;stroke-width:1.6;transition:opacity .2s}
+.edge.doc{stroke:var(--ink)}
+.edge.vgl{stroke:var(--ussr);stroke-dasharray:7 5}
+.edge.ctx{stroke:var(--muted);stroke-dasharray:1.5 4;stroke-linecap:round;stroke-width:2}
+.hit{fill:none;stroke:transparent;stroke-width:12;cursor:help}
+.node{cursor:pointer;transition:opacity .2s}
+.node rect{fill:var(--node);stroke-width:1.6}
+.node.person rect{fill:var(--ink);stroke:var(--ink)}
+.node.person .t1{fill:var(--sheet)}
+.node.person .t2{fill:var(--sheet);opacity:.75}
+.node.event rect{stroke-dasharray:4 3}
+.node .t1{font-family:var(--f-body);font-size:12.5px;font-weight:650;fill:var(--ink)}
+.node .t2{font-family:var(--f-mono);font-size:10px;fill:var(--muted)}
+.node.hub rect{stroke-width:2.4}
+.node.hub .t1{font-size:15px;font-weight:800}
+.node.sel rect{stroke-width:3}
+.dimmed{opacity:var(--dim)}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){.edge,.node{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Städtebau-Referenzen · Mindmap der Querverweise</div>
+    <h1>Zwei Systeme, <em>eine Moderne?</em></h1>
+    <p class="lede">Mies van der Rohe, Bauhaus, sowjetische Avantgarde, DDR, Schwedt/Oder und was seit 1990 aus diesen Bauten geworden ist, auf einem Plan. Waagerecht liegt die Region, senkrecht die Zeit. Durchgezogene Linien sind belegte historische Verbindungen, rote gestrichelte Linien formale Vergleiche, gepunktete Linien Orts- und Kontextbezüge. Ein Klick auf ein Projekt zeigt Details und alle Verbindungen.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Verbindungen filtern">
+    <span class="lbl">Verbindungen:</span>
+    <button class="chip" data-type="doc" aria-pressed="true"><svg viewBox="0 0 26 8"><line x1="0" y1="4" x2="26" y2="4" class="edge doc"/></svg>Belegter Bezug</button>
+    <button class="chip" data-type="vgl" aria-pressed="true"><svg viewBox="0 0 26 8"><line x1="0" y1="4" x2="26" y2="4" class="edge vgl"/></svg>Formaler Vergleich</button>
+    <button class="chip" data-type="ctx" aria-pressed="true"><svg viewBox="0 0 26 8"><line x1="0" y1="4" x2="26" y2="4" class="edge ctx"/></svg>Ort / Kontext</button>
+    <button class="chip reset" id="reset" type="button">Auswahl aufheben</button>
+  </div>
+
+  <div class="layout">
+    <div class="mapbox"><svg id="map" viewBox="0 0 1400 1220" role="img" aria-label="Mindmap der Projekte und Querverweise"></svg></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+
+  <section class="block">
+    <h3>Gegenüberstellungen für die Arbeit</h3>
+    <p>Die fünf Paare A bis E stammen aus deiner Quellenliste. F bis K ergänzen den Bezug zu DDR und Schwedt, L bis Q die VT-Falte und die Fortschreibung nach 1990. Bei jedem Paar steht, ob die Verbindung historisch belegt ist oder nur formal vergleichbar. Diese Unterscheidung ist für die Argumentation entscheidend.</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="block">
+    <h3>Quellen und Bildarchive</h3>
+    <p>Archive aus deiner Liste plus die Bildordner, die bereits in „städtebau ähnliche projekte“ liegen.</p>
+    <ul class="srcs" id="srcs"></ul>
+    <p class="note">Nutzungsrechte: Bilder von Wikimedia Commons tragen ihre Lizenz auf der jeweiligen Dateiseite (die Datei Quellen_und_Lizenzen.csv im Ordner listet sie auf). MoMA, Bauhaus-Archiv und RIBA verlangen für Veröffentlichungen meist eine eigene Genehmigung; für Präsentationen an der Uni reicht in der Regel die Quellenangabe. Originalzeichnungen von Mies sind bis Ende 2039 urheberrechtlich geschützt.</p>
+  </section>
+</div>
+
+<script>
+const REG = {west:'var(--west)', brd:'var(--brd)', ddr:'var(--ddr)', ussr:'var(--ussr)'};
+const REGNAME = {west:'Westen (USA, Westeuropa)', brd:'Deutschland (bis 1945, dann BRD)', ddr:'Gebiet der späteren DDR', ussr:'Sowjetunion'};
+// kind: project | person | event | hub
+const N = [
+ {id:'mies',kind:'hub',reg:'brd',x:530,y:475,t:'Mies van der Rohe',m:'1886–1969',
+  d:'Zentrale Figur der Karte. Arbeitete bis 1938 in Berlin, war 1930–33 letzter Direktor des Bauhauses und ging dann nach Chicago (IIT). Sein Werk verbindet die Berliner Avantgarde der 1920er mit dem International Style der Nachkriegszeit.',
+  src:'MoMA – Mies van der Rohe Archive; Bauhaus-Archiv Berlin'},
+ // Westen
+ {id:'corb',kind:'person',reg:'west',x:190,y:105,t:'Le Corbusier',m:'1887–1965',
+  d:'Baute 1927 mit Mies an der Weißenhofsiedlung und in den späten 1920ern das Centrosoyuz in Moskau. Damit ist er der westliche Architekt mit dem direktesten eigenen Bau in der Sowjetunion.',src:'RIBA – Modernism Collection'},
+ {id:'barc',kind:'project',reg:'west',x:190,y:215,t:'Barcelona-Pavillon',m:'1929 · Barcelona',
+  d:'Deutscher Pavillon der Weltausstellung: freier Grundriss, Stahlstützen, Glas, Naturstein. 1930 abgebaut, 1986 rekonstruiert. Ein Staat stellt sich über reine Raumkunst dar.',src:'MoMA – Originalzeichnungen; NGA'},
+ {id:'unite',kind:'project',reg:'west',x:265,y:425,t:'Unité d’Habitation',m:'1947–1952 · Marseille',
+  d:'Wohnmaschine mit Innenstraße, Läden und Gemeinschaftsflächen auf dem Dach. Häufig mit dem Narkomfin-Haus verglichen; Le Corbusier kannte die Moskauer Kommunehäuser.',src:'RIBA'},
+ {id:'farns',kind:'project',reg:'west',x:115,y:470,t:'Farnsworth House',m:'1945–51 · Plano',folder:'09_Mies_Farnsworth_House_Plaene_Schnitte_HABS',
+  d:'Gläserner Pavillon auf Stahlstützen über der Aue. Im Bildordner liegen die gemeinfreien HABS-Blätter mit Grundriss, Ansichten, Schnitten und Details.',src:'HABS / Library of Congress (gemeinfrei); MoMA'},
+ {id:'johnson',kind:'project',reg:'west',x:280,y:525,t:'Glass House (P. Johnson)',m:'1949 · New Canaan',
+  d:'Philip Johnson sah Mies’ Pläne für das Farnsworth House 1947 bei der MoMA-Ausstellung und baute sein Glashaus noch vor dessen Fertigstellung.',src:'MoMA'},
+ {id:'lsd',kind:'project',reg:'west',x:115,y:575,t:'860–880 Lake Shore Drive',m:'1949–51 · Chicago',folder:'08_Mies_860-880_Lake_Shore_Drive_Chicago',
+  d:'Zwei Wohnhochhäuser mit Stahlskelett und vorgehängtem Raster. Prototyp des seriellen Wohnhochhauses im Westen.',src:'Wikimedia Commons'},
+ {id:'crown',kind:'project',reg:'west',x:110,y:660,t:'Crown Hall, IIT',m:'1950–1956 · Chicago',
+  d:'Stützenfreie Halle unter außenliegenden Stahlträgern. Direkter Vorläufer der Neuen Nationalgalerie.',src:'RIBA'},
+ {id:'seag',kind:'project',reg:'west',x:270,y:660,t:'Seagram Building',m:'1954–1958 · New York',
+  d:'Bronzefarbene Rasterfassade, zurückgesetzte Plaza. Wurde weltweit zum Bild des Bürohochhauses, auch als Gegenbild in der sowjetischen Architekturdebatte.',src:'MoMA'},
+ {id:'lafay',kind:'project',reg:'west',x:240,y:800,t:'Lafayette Park',m:'1956–63 · Detroit',folder:'07_Mies_Lafayette_Park_Detroit',
+  d:'Wohnsiedlung von Mies mit Stadtplanung von Ludwig Hilberseimer: Hochhausscheiben, Reihenhäuser, autofreier Park. Entstand im Zuge der Flächensanierung des Viertels Black Bottom. Der beste Vergleichsfall zu Schwedt, weil beide Projekte zeitgleich Wohnen für eine Industriegesellschaft planen.',src:'Wikimedia Commons'},
+ // Deutschland
+ {id:'fried',kind:'project',reg:'brd',x:530,y:100,t:'Hochhaus Friedrichstraße',m:'1921/22 · Entwurf',
+  d:'Wettbewerbsbeitrag für ein gläsernes Hochhaus am Bahnhof Friedrichstraße. Nie gebaut. Der Bauplatz lag später in Ost-Berlin.',src:'Bauhaus-Archiv; MoMA'},
+ {id:'weiss',kind:'project',reg:'brd',x:430,y:190,t:'Weißenhofsiedlung',m:'1927 · Stuttgart',folder:'05_Mies_Weissenhofsiedlung_Stuttgart',
+  d:'Werkbund-Ausstellung unter künstlerischer Leitung von Mies, mit Bauten von Le Corbusier, Gropius und anderen. Mies’ Mietshaus erprobt flexible Grundrisse im Stahlskelett.',src:'Wikimedia Commons'},
+ {id:'afrika',kind:'project',reg:'brd',x:625,y:190,t:'Afrikanische Straße',m:'1926–27 · Berlin',folder:'06_Mies_Wohnanlage_Afrikanische_Strasse_Berlin',
+  d:'Mies’ einzige Siedlung im sozialen Wohnungsbau Berlins. Schlichte Putzbauten in Zeilen, ein frühes Beispiel für rationalisiertes Wohnen.',src:'Wikimedia Commons'},
+ {id:'grop',kind:'person',reg:'brd',x:425,y:290,t:'Walter Gropius',m:'Bauhaus-Gründer',
+  d:'Gründete 1919 das Bauhaus und entwarf 1926 das Bauhausgebäude in Dessau. In seinem Büro arbeitete Richard Paulick, der spätere Chefarchitekt von Schwedt.',src:'Bauhaus-Archiv'},
+ {id:'hilb',kind:'person',reg:'brd',x:640,y:290,t:'Ludwig Hilberseimer',m:'Hochhausstadt 1924',
+  d:'Entwarf 1924 die „Hochhausstadt“ als radikal rationalisierte Großstadt. Lehrte am Bauhaus, folgte Mies 1938 nach Chicago und plante dort Lafayette Park.',src:'Bauhaus-Archiv'},
+ {id:'meyer',kind:'person',reg:'brd',x:530,y:365,t:'Hannes Meyer',m:'Bauhaus-Direktor 1928–30',
+  d:'Mies’ Vorgänger als Bauhaus-Direktor. Nach seiner Entlassung ging er 1930 mit Studierenden in die Sowjetunion. Die wichtigste personelle Brücke zwischen Bauhaus und sowjetischer Moderne.',src:'Bauhaus-Archiv'},
+ {id:'nng',kind:'project',reg:'brd',x:530,y:700,t:'Neue Nationalgalerie',m:'1965–68 · West-Berlin',folder:'04_Mies_Neue_Nationalgalerie_Berlin',
+  d:'Mies’ einziger Nachkriegsbau in Deutschland, unweit der Mauer im Kulturforum. Gläserne Halle unter einem Stahldach auf acht Stützen. Im Kalten Krieg auch ein Statement des Westens.',src:'Wikimedia Commons'},
+ // DDR-Gebiet
+ {id:'revol',kind:'project',reg:'ddr',x:860,y:100,t:'Revolutionsdenkmal',m:'1926 · Berlin',folder:'01_Mies_Revolutionsdenkmal_Berlin_1926',
+  d:'Denkmal für Karl Liebknecht und Rosa Luxemburg im Auftrag der KPD (vermittelt durch Eduard Fuchs). Eine Klinkerwand mit Stern, Hammer und Sichel. 1935 von den Nationalsozialisten abgerissen. Die DDR baute am Friedhof die Gedenkstätte der Sozialisten; eine Gedenkanlage markiert den alten Standort.',src:'Wikimedia Commons; Bundesarchiv'},
+ {id:'wolf',kind:'project',reg:'ddr',x:860,y:170,t:'Villa Wolf',m:'1925–1927 · Guben',folder:'03_Mies_Villa_Wolf_Guben',
+  d:'Backsteinvilla über der Neiße, 1945 zerstört. Das Grundstück liegt heute im polnischen Gubin, direkt an der Oder-Neiße-Grenze.',src:'Wikimedia Commons'},
+ {id:'lemke',kind:'project',reg:'ddr',x:860,y:240,t:'Haus Lemke',m:'1932–33 · Berlin',folder:'02_Mies_Haus_Lemke_Berlin_Hohenschoenhausen_DDR',
+  d:'Mies’ letztes in Deutschland realisiertes Haus vor der Emigration. Lag später in Ost-Berlin und wurde unter anderem vom Ministerium für Staatssicherheit genutzt. Heute Ausstellungsort „Mies van der Rohe Haus“.',src:'miesvanderrohehaus.de; Wikimedia Commons'},
+ {id:'bauh',kind:'project',reg:'ddr',x:860,y:320,t:'Bauhaus Dessau',m:'1925–1933',
+  d:'Schule von Gropius, Meyer und Mies. Dessau lag nach 1945 in der DDR. Dort galt das Bauhaus zuerst als „formalistisch“; ab den 1960ern wurde es rehabilitiert und das Gebäude 1976 restauriert.',src:'Bauhaus-Archiv; Stiftung Bauhaus Dessau'},
+ {id:'stalin',kind:'event',reg:'ddr',x:860,y:450,t:'Stalinallee / Formalismusstreit',m:'1950–1955',
+  d:'Nationale Bautradition statt Bauhaus: Die DDR baute nach sowjetischem Vorbild repräsentative Wohnpaläste. Richard Paulick leitete einen Bauabschnitt. Mit Chruschtschows Kurswechsel endete dieser Stil.',src:'Bundesarchiv'},
+ {id:'paul',kind:'person',reg:'ddr',x:860,y:530,t:'Richard Paulick',m:'1903–1979',
+  d:'Mitarbeiter im Büro Gropius (1925–1930), Exil in Shanghai, ab 1950 in der DDR. Chefarchitekt der sozialistischen Städte Hoyerswerda (1958–60), Schwedt (1962–65) und Halle-Neustadt (1963–68). Die direkte Linie vom Bauhaus nach Schwedt.',src:'architectuul.com; TUM mediaTUM'},
+ {id:'schwedt',kind:'project',reg:'ddr',x:860,y:680,t:'Schwedt/Oder',m:'1960er–1980er',folder:'10_Schwedt_DDR_Wohnungsbau_Stadtplanung',
+  d:'Ausbau zur sozialistischen Industriestadt für das Petrolchemische Kombinat. Die Einwohnerzahl wuchs von rund 6.000 auf über 50.000. Neue Wohngebiete in Plattenbauweise; nach 1990 starker Rückbau.',src:'Bundesarchiv (Wikimedia Commons)'},
+ {id:'wbs',kind:'project',reg:'ddr',x:815,y:805,t:'Plattenbau P2 / WBS 70',m:'1960er / ab 1972',folder:'12_DDR_Plattenbau_WBS70_P2_Grundrisse',
+  d:'Typisierte Großplattenbauten. Der Bildordner enthält Grundrisse beider Typen. Gegenstück zum Stahlskelett-Raster im Westen: Serialität mit anderen Mitteln.',src:'Wikimedia Commons'},
+ {id:'pck',kind:'event',reg:'ddr',x:1035,y:805,t:'Erdölleitung „Druschba“',m:'1963 · Schwedt',
+  d:'Die Pipeline aus der Sowjetunion endet im PCK Schwedt. Ohne sowjetisches Öl gäbe es die Neustadt Schwedt nicht. Ein wirtschaftlicher, kein architektonischer Bezug, aber zentral für die Stadtgeschichte.',src:'Bundesarchiv'},
+ // UdSSR
+
+ // VT-Falte
+ {id:'vt',kind:'project',reg:'ddr',x:975,y:615,t:'VT-Falte',m:'1967–1970er',folder:'13_VT-Falte_Konstruktion_Technik',
+  d:'Vorgefertigtes Dachelement aus Spannbeton mit trapezförmigem Querschnitt, entwickelt von Eberhard Kühn und Karlheinz Weißbach am Institut für Stahlbeton Dresden. Typ VT 18: 2,40 m breit, 65 cm hoch, 12 bis 21 m lang, Schale nur 5 bis 6 cm dick, Spannstähle in den Fußflanschen. Ab 1970 in mehreren Bezirken der DDR in Serie gefertigt. Im Ordner liegt die Konstruktionszeichnung mit Querschnitt und Bewehrung.',src:'Wikipedia „VT-Falte“; Deutsche Fotothek; Wikimedia Commons'},
+ {id:'vth',kind:'project',reg:'ddr',x:1000,y:725,t:'Volksschwimmhallen, Kaufhallen',m:'1969–1980er',folder:'14_VT-Falte_Bauten_Schwimmhallen_Kaufhallen',
+  d:'Typenbauten mit VT-Falten-Dach: Schwimmhallen (erste 1969 an der Steinstraße in Dresden, Typen A bis D), Turn- und Sporthallen, Kaufhallen, Kindergärten, Gaststätten. Das gefaltete Dach ist an der Attika sofort zu erkennen. Viele Hallen stehen leer oder wurden abgerissen.',src:'Wikimedia Commons, Kategorie VT-Falten'},
+ // Fortschreibung
+ {id:'nngc',kind:'project',reg:'brd',x:530,y:1010,t:'Neue Nationalgalerie, Sanierung',m:'2015–2021 · David Chipperfield',
+  d:'Grundinstandsetzung durch David Chipperfield Architects: Das Gebäude wurde bis auf den Rohbau zerlegt, rund 35.000 Bauteile wurden ausgebaut, restauriert und wieder eingebaut. Leitidee: so viel Mies wie möglich, Eingriffe kaum sichtbar.',src:'Staatliche Museen zu Berlin; Wikimedia Commons'},
+ {id:'fisch',kind:'project',reg:'ddr',x:770,y:1000,t:'Schwimmhalle Fischerinsel',m:'Sanierung 2009',folder:'14_VT-Falte_Bauten_Schwimmhallen_Kaufhallen',
+  d:'Volksschwimmhalle Typ C von Karl-Heinz Swora und Gunter Derdau (1979). Saniert von Veauthier Meyer Architekten: VT-Falten-Dach konstruktiv und energetisch ertüchtigt, Dämmung gestuft, damit die dünne gefaltete Attika sichtbar bleibt. Entwässerung von innen nach außen umgedreht.',src:'BauNetz Wissen'},
+ {id:'kultur',kind:'project',reg:'ddr',x:770,y:1075,t:'Kulturpalast Dresden',m:'Umbau 2013–2017',folder:'15_Fortschreibung_Kulturpalast_Dresden',
+  d:'Kulturhaus von Wolfgang Hänsch (1969) mit gläsernem Foyer am Altmarkt. gmp baute den Mehrzwecksaal zum Konzertsaal um und brachte die Zentralbibliothek und ein Kabarett unter. Hülle und Foyers blieben erhalten. DAM Preis 2019.',src:'Wikimedia Commons; DAM Preis 2019'},
+ {id:'stat',kind:'project',reg:'ddr',x:770,y:1150,t:'Haus der Statistik',m:'seit 2015',folder:'16_Fortschreibung_Haus_der_Statistik_Berlin',
+  d:'Bürokomplex am Alexanderplatz (1968–70), ab 2008 leer. 2015 machte eine Initiative aus Kunst und Architektur den Bau zum Thema („Allesandersplatz“). Heute Modellprojekt einer Kooperation aus Land, Bezirk, Wohnungsbaugesellschaft und Zivilgesellschaft mit Pioniernutzung, Sanierung und Neubauten.',src:'hausderstatistik.org; Wikimedia Commons'},
+ {id:'leine',kind:'project',reg:'ddr',x:1000,y:1000,t:'Leinefelde Südstadt',m:'Umbau 2004',folder:'17_Fortschreibung_Leinefelde_Plattenbau_Umbau',
+  d:'Stefan Forster Architekten bauten eine 180 m lange WBS-70-Zeile mit 150 Wohnungen zu acht Stadtvillen um: jedes zweite Treppenhaus abgebrochen, ein Geschoss weniger, Stahl-Ringanker zur Aussteifung. Bekanntes Beispiel für Umbau statt Abriss.',src:'BauNetz Wissen'},
+ {id:'ahr',kind:'project',reg:'ddr',x:1000,y:1075,t:'Ahrensfelder Terrassen',m:'Rückbau ab 2003',folder:'18_Fortschreibung_Rueckbau_Marzahn_Ahrensfelder_Terrassen',
+  d:'Berlin-Marzahn: Elfgeschosser wurden etwa um die Hälfte abgetragen und zu terrassierten Häusern mit Balkonen, Terrassen und Mietergärten umgebaut (Architekt Stephan Schüttauf). Ein Pilotprojekt des Programms Stadtumbau Ost.',src:'BauNetz Meldung 2003; Wikimedia Commons'},
+ {id:'schwu',kind:'event',reg:'ddr',x:1000,y:1150,t:'Schwedt: Stadtumbau',m:'seit 1999',
+  d:'Von 51.161 Einwohnern (1990) auf 39.702 (2001). Ab 1999 Rückbau, Ziel bis 2010: rund 5.000 Wohnungen weniger. Schwerpunkt ist die Obere Talsandterrasse am Stadtrand (Am Waldrand), während Zentrum und Neue Zeit saniert werden. Neubau ist nicht vorgesehen.',src:'Stadt Schwedt, ISEK 2002 (Land Brandenburg)'},
+ {id:'narkr',kind:'project',reg:'ussr',x:1225,y:1010,t:'Narkomfin, Restaurierung',m:'2017–2020 · Moskau',
+  d:'Nach Jahrzehnten des Verfalls restauriert, mit Rückbau späterer Einbauten und Rekonstruktion der Splitlevel-Wohnungen. Gegenstück zu den westlichen Restaurierungen von Mies-Bauten.',src:'Wikimedia Commons – Narkomfin Building'},
+ {id:'leon',kind:'project',reg:'ussr',x:1120,y:100,t:'Lenin-Institut (Leonidow)',m:'1927 · Entwurf',
+  d:'Diplomentwurf von Iwan Leonidow: Hochhaus, Kugel und Flachbau, verspannt mit Seilen. Architektur als technische Zukunftsvision.',src:'MoMA – Ivan Leonidov'},
+ {id:'mostorg',kind:'project',reg:'ussr',x:1295,y:100,t:'Mostorg (Wesnin)',m:'1927–1928 · Moskau',
+  d:'Kaufhaus der Brüder Wesnin mit großer Glasfassade über Eck. Eines der frühesten Glas-Geschäftshäuser in Moskau.',src:'Wikimedia Commons – Konstruktivismus'},
+ {id:'mel',kind:'project',reg:'ussr',x:1120,y:170,t:'Melnikow-Bauten',m:'1925–1929',
+  d:'Konstantin Melnikow: Sowjetischer Pavillon in Paris (1925), Russakow-Arbeiterklub (1927–28) und sein eigenes Zylinderhaus (1927–29). Expressive Geometrie statt Raster.',src:'Wikimedia Commons'},
+ {id:'shuk',kind:'project',reg:'ussr',x:1295,y:170,t:'Schuchow-Turm',m:'1920–1922 · Moskau',
+  d:'Hyperboloider Stahlgitterturm von Wladimir Schuchow. Ingenieurbau als Ausdrucksmittel.',src:'Wikimedia Commons'},
+ {id:'nark',kind:'project',reg:'ussr',x:1120,y:250,t:'Narkomfin-Kommunehaus',m:'1928–1930 · Moskau',
+  d:'Moissei Ginsburg und Ignati Milinis: Wohnhaus mit Splitlevel-Wohnungen, Laubengängen und Gemeinschaftstrakt. Nach langem Verfall bis 2020 restauriert.',src:'Wikimedia Commons – Narkomfin Building'},
+ {id:'centro',kind:'project',reg:'ussr',x:1295,y:250,t:'Centrosoyuz',m:'1928–1936 · Moskau',
+  d:'Verwaltungsbau von Le Corbusier für den Genossenschaftsverband. Glasfassaden, Pilotis, Rampen. Ein westlicher Modernist baut mitten in Moskau.',src:'Wikimedia Commons'},
+ {id:'brig',kind:'event',reg:'ussr',x:1205,y:335,t:'Westliche Brigaden in der UdSSR',m:'1930–1937',
+  d:'Ernst May plante mit seiner Brigade neue Industriestädte wie Magnitogorsk, Hannes Meyer kam mit der Bauhaus-Brigade „Rot Front“. Mit dem Stalinismus endete der Austausch.',src:'Bauhaus-Archiv'},
+ {id:'khru',kind:'event',reg:'ussr',x:1205,y:475,t:'Chruschtschow-Rede',m:'Dezember 1954',
+  d:'„Besser, billiger, schneller bauen“: Abkehr vom stalinistischen Dekor, Hinwendung zu Typisierung und Vorfertigung. Die DDR folgte 1955 mit der Baukonferenz.',src:'Bundesarchiv'},
+ {id:'cher',kind:'project',reg:'ussr',x:1150,y:680,t:'Nowyje Tscherjomuschki',m:'1956–59 · Moskau',folder:'11_Sowjetunion_Moskau_Novye_Cheryomushki',
+  d:'Experimentelles Wohnviertel (Kwartal 9) und Ursprung der Chruschtschowka. Modell für den Massenwohnungsbau im ganzen Ostblock.',src:'Wikimedia Commons'},
+ {id:'pion',kind:'project',reg:'ussr',x:1300,y:620,t:'Palast der Pioniere',m:'1958–1962 · Moskau',
+  d:'Transparente, horizontal gegliederte Pavillons im Park. Zeigt die Rückkehr der Moderne in der Tauwetterzeit.',src:'Wikimedia Commons – Soviet Modernism'},
+ {id:'brut',kind:'project',reg:'ussr',x:1225,y:805,t:'Spätsowjetische Moderne',m:'1963–1985',
+  d:'Ostankino-Turm (1963–67), Ministerium für Straßenbau Tiflis (1975), Haus der Sowjets Kaliningrad (ab 1970), Hotel Saljut Kiew (1984), Sanatorium Druschba Jalta (1985). Nachkriegsmoderne und Brutalismus sind dabei nicht dasselbe.',src:'RIBA – Brutalism; Wikimedia Commons'}
+];
+// type: doc = belegt, vgl = formaler Vergleich, ctx = Ort/Kontext ; code = Paar aus Quellenliste
+const E = [
+ ['mies','fried','doc','Eigener Entwurf'],['mies','weiss','doc','Künstlerische Leitung'],['mies','afrika','doc','Eigener Bau'],
+ ['mies','barc','doc','Eigener Bau'],['mies','revol','doc','Eigener Bau für die KPD'],['mies','wolf','doc','Eigener Bau'],['mies','lemke','doc','Eigener Bau'],
+ ['mies','bauh','doc','Direktor 1930–1933'],['mies','farns','doc','Eigener Bau'],['mies','lsd','doc','Eigener Bau'],['mies','crown','doc','Eigener Bau'],
+ ['mies','seag','doc','Eigener Bau'],['mies','lafay','doc','Eigener Bau'],['mies','nng','doc','Eigener Bau'],
+ ['meyer','mies','doc','Mies folgt ihm 1930 als Direktor'],['meyer','bauh','doc','Direktor 1928–1930'],['meyer','brig','doc','Geht 1930 in die UdSSR'],
+ ['grop','bauh','doc','Gründer, Bauhausgebäude 1926'],['grop','weiss','doc','Baut in der Siedlung mit'],['corb','weiss','doc','Baut in der Siedlung mit'],
+ ['corb','centro','doc','Eigener Bau in Moskau'],['corb','unite','doc','Eigener Bau'],
+ ['hilb','mies','doc','Kollege am Bauhaus und am IIT'],['hilb','lafay','doc','Stadtplanung'],
+ ['paul','grop','doc','Mitarbeiter 1925–1930'],['paul','stalin','doc','Leitet Bauabschnitt C'],['paul','schwedt','doc','Chefarchitekt 1962–1965'],
+ ['bauh','stalin','doc','In der DDR zunächst als „formalistisch“ abgelehnt'],['bauh','brig','doc','Bauhaus-Brigade „Rot Front“'],
+ ['khru','stalin','doc','Beendet die „Zuckerbäcker“-Architektur'],['khru','cher','doc','Programm des Massenwohnungsbaus'],['khru','wbs','doc','DDR übernimmt industrielles Bauen (1955)'],
+ ['cher','wbs','doc','Sowjetisches Vorbild für die Typenbauten'],['schwedt','wbs','doc','Wohngebiete in Plattenbauweise'],['schwedt','pck','doc','Stadtgründung für das Kombinat'],
+ ['farns','johnson','doc','Johnson kannte die Pläne ab 1947'],
+ // Vergleiche aus der Quellenliste
+ ['fried','leon','vgl','A · Architektur als technologische Zukunftsvision','A'],
+ ['weiss','nark','vgl','B · Rationalisierung des Wohnens und Ideologie','B'],
+ ['fried','mostorg','vgl','C · Transparenz und Industrieästhetik','C'],
+ ['nng','pion','vgl','D · Andere Systeme, ähnliche Mittel','D'],
+ ['unite','nark','vgl','E · Kollektives Wohnen und Erschließung','E'],
+ // eigene Vergleiche
+ ['lafay','schwedt','vgl','Wohnen für die Industriegesellschaft, zeitgleich in Ost und West','F'],
+ ['hilb','schwedt','vgl','Rationalisierte Stadtplanung: Hochhausstadt und sozialistische Neustadt','G'],
+ ['lsd','wbs','vgl','Serialität: Stahlskelett-Raster gegen Großplatte','H'],
+ ['barc','mel','vgl','Ausstellungspavillon als Staatsrepräsentation','I'],
+ ['lafay','cher','vgl','Siedlung im Grünen als Massenmodell','J'],
+ ['shuk','brut','vgl','Ingenieurbau als Ausdrucksmittel','K'],
+
+ ['vt','vth','doc','Dachelement der Typenhallen'],['vt','wbs','ctx','Gleiche Logik der Vorfertigung'],['khru','vt','ctx','Industrielles Bauen als Programm'],
+ ['vth','fisch','doc','Typ C, saniert 2009'],['vth','schwedt','ctx','Kaufhallen und Schwimmhallen gehören zu den Neubaugebieten'],
+ ['nng','nngc','doc','Grundinstandsetzung'],['kultur','stalin','ctx','Ostmoderne der 1960er nach dem Ende der Stalinallee'],['stat','kultur','ctx','Ostmoderne der 1960er im Stadtzentrum'],
+ ['leine','wbs','doc','Umbau einer WBS-70-Zeile'],['ahr','wbs','doc','Rückbau von Plattenbauten'],['schwu','schwedt','doc','Rückbau und Sanierung der Neustadt'],
+ ['schwu','ahr','vgl','Rückbau: Abriss ganzer Blöcke oder Abtragen der oberen Geschosse'],['narkr','nark','doc','Restaurierung'],
+ ['vt','crown','vgl','Weitgespannte Halle: Stahlträger gegen Spannbetonfalte','L'],
+ ['fisch','nngc','vgl','Sanierung mit Respekt vor der Moderne, in Ost und West','M'],
+ ['schwu','leine','vgl','Schrumpfende Plattenbaustadt: Abriss oder Umbau','N'],
+ ['lafay','leine','vgl','Was wird aus der Siedlung? Denkmal in Detroit, Umbau in Leinefelde','O'],
+ ['kultur','pion','vgl','Transparente Kulturbauten der Ostmoderne','P'],
+ ['narkr','nngc','vgl','Ikonen der Moderne restaurieren: Moskau und Berlin','Q'],
+ // Kontext
+ ['fried','lemke','ctx','Bauplatz bzw. Bau lag später in Ost-Berlin'],
+ ['revol','stalin','ctx','DDR baut 1951 die Gedenkstätte der Sozialisten am selben Friedhof'],
+ ['wolf','schwedt','ctx','Beide an der Oder-Neiße-Grenze'],
+ ['pck','khru','ctx','Sowjetisches Öl als Grundlage der Stadt'],
+ ['nng','stalin','ctx','Ost und West bauen um die Wette um das richtige Bild der Moderne']
+];
+const CARDS = {
+
+ L:{q:'Zwei Wege zur stützenfreien Halle: außenliegende Stahlträger bei Mies, dünne vorgespannte Betonfalten in der DDR. Querschnitt im Ordner 13, HABS-Blätter im Ordner 09.',b:'Formal, technikgeschichtlich gut belegbar'},
+ M:{q:'Wie viel Eingriff verträgt ein Bau der Moderne? Chipperfield an der Nationalgalerie gegen die gestufte Dachdämmung an der Fischerinsel.',b:'Formal, gleiche Fragestellung der Denkmalpflege'},
+ N:{q:'Schwedt reißt am Stadtrand ganze Blöcke ab, Leinefelde baut Zeilen zu Stadtvillen um. Welche Strategie erhält Stadt?',b:'Direkt vergleichbar, beide Stadtumbau Ost'},
+ O:{q:'Lafayette Park steht unter Denkmalschutz und ist gefragt, Leinefelde musste umgebaut werden. Liegt es an Architektur, Eigentum oder Wirtschaft?',b:'Formal, starke These für die Arbeit'},
+ P:{q:'Glasfoyers als öffentlicher Raum: Kulturpalast Dresden und Pionierpalast Moskau.',b:'Formal, gleiche Epoche der Ostmoderne'},
+ Q:{q:'Restaurierung als Fortschreibung: Was wird rekonstruiert, was bleibt sichtbar alt?',b:'Formal'},
+ A:{q:'Wie wird Technik zur Zukunftsvision? Gläsernes Prisma gegen gespannte Geometrie.',b:'Formal, kein direkter Kontakt belegt'},
+ B:{q:'Welche Gesellschaft schreibt der Grundriss vor? Flexible Mietwohnung gegen Kommunehaus mit Gemeinschaftstrakt.',b:'Formal, gleiche Jahre, gemeinsame Debatte'},
+ C:{q:'Was bedeutet die große Glasfläche in Berlin und in Moskau: Werbung, Licht oder Ideologie?',b:'Formal'},
+ D:{q:'Transparenz, horizontale Gliederung und offene Halle als Mittel zweier politischer Systeme.',b:'Formal, beide in der Systemkonkurrenz der 1960er'},
+ E:{q:'Innenstraße, Splitlevel, Gemeinschaftseinrichtungen: Wie viel Narkomfin steckt in der Unité?',b:'Einfluss oft vermutet, Le Corbusier kannte Moskau'},
+ F:{q:'Lafayette Park und Schwedt planen zeitgleich Wohnungen für Industriearbeit. Was unterscheidet Eigentum, Dichte und Freiraum?',b:'Formal, beste Vergleichsachse zu Schwedt'},
+ G:{q:'Von der Hochhausstadt 1924 zur sozialistischen Neustadt: Bleibt die Rationalisierung gleich, wenn sich das System ändert?',b:'Ideengeschichtlich, Brücke über Paulick und Bauhaus'},
+ H:{q:'Serielles Bauen mit Stahlskelett und Vorhangfassade gegen tragende Großplatte. Grundrisse im Ordner 08 und 12.',b:'Formal'},
+ I:{q:'Wie zeigt sich ein Staat auf der Weltausstellung? Barcelona 1929 gegen Paris 1925.',b:'Formal'},
+ J:{q:'Zeilen und Scheiben im Park als Antwort auf Wohnungsnot in Detroit und Moskau.',b:'Formal'},
+ K:{q:'Vom Stahlgitterturm zum Betonbau: Konstruktion als Bild.',b:'Formal'}
+};
+const SRCS = [
+ ['Museum of Modern Art – Mies van der Rohe','https://www.moma.org/collection/?q=Mies%20van%20der%20Rohe','Originalzeichnungen, Modelle, Fotografien (Barcelona, Farnsworth, Seagram, Friedrichstraße)'],
+ ['Bauhaus-Archiv Berlin','https://www.bauhaus.de','Fotografien und Dokumente zu Mies, Gropius, Meyer, Hilberseimer'],
+ ['RIBA Collections','https://www.ribapix.com','Architekturfotografie: Moderne und Brutalismus'],
+ ['National Gallery of Art','https://www.nga.gov/collection-search-result.html?artist=Mies%20van%20der%20Rohe','Barcelona-Pavillon, historische Ausstellung'],
+ ['MoMA – Ivan Leonidov','https://www.moma.org/collection/?q=Leonidov','Sowjetische Avantgarde, Lenin-Institut'],
+ ['Wikimedia Commons – Narkomfin Building','https://commons.wikimedia.org/wiki/Category:Narkomfin_Building','Über 50 Bilder, historisch und aktuell'],
+ ['Wikimedia Commons – Neue Nationalgalerie','https://commons.wikimedia.org/wiki/Category:Neue_Nationalgalerie','Fotogalerie, bereits als Ordner 04 heruntergeladen'],
+ ['Wikimedia Commons – Konstruktivismus','https://commons.wikimedia.org/w/index.php?search=Constructivist+architecture+Moscow&title=Special:MediaSearch&type=image','Bildsuche sowjetischer Konstruktivismus'],
+ ['Wikimedia Commons – Soviet Modernism','https://commons.wikimedia.org/w/index.php?search=Soviet+modernism+architecture&title=Special:MediaSearch&type=image','Bildsuche Nachkriegsmoderne und Brutalismus'],
+ ['Mies van der Rohe Haus (Haus Lemke)','https://www.miesvanderrohehaus.de','Geschichte des Hauses, Nutzung in der DDR'],
+ ['Richard Paulick (architectuul)','https://architectuul.com/architect/richard-paulick','Biografie, Rolle in Hoyerswerda, Schwedt, Halle-Neustadt'],
+ ['BauNetz Wissen – Schwimmhalle Fischerinsel','https://www.baunetzwissen.de/geneigtes-dach/objekte/sport-freizeit/instandsetzung-einer-ddr-typen-schwimmhalle-in-berlin-999573','Sanierung eines VT-Falten-Dachs, Typ C'],
+ ['BauNetz Wissen – Leinefelde','https://www.baunetzwissen.de/bauen-im-bestand/objekte/wohnen/rueckbau-einer-plattenbauzeile-in-leinefelde-69134','WBS 70 zu Stadtvillen, Stefan Forster'],
+ ['Wikimedia Commons – VT-Falten','https://commons.wikimedia.org/wiki/Category:VT-Falten','Über 60 Bilder von Hallen mit VT-Falten-Dach'],
+ ['Wikipedia – VT-Falte','https://de.wikipedia.org/wiki/VT-Falte','Entwicklung, Maße, Liste von Bauten'],
+ ['Bildordner auf deinem Rechner','#','„städtebau ähnliche projekte“: 18 Unterordner, 232 Bilder, Lizenzen in den beiden Quellen-CSV-Dateien']
+];
+
+const svg = document.getElementById('map'), NS='http://www.w3.org/2000/svg';
+const el=(n,a={},p=svg)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;};
+const byId=Object.fromEntries(N.map(n=>[n.id,n]));
+// Bänder
+const cols=[['west',20,360],['brd',360,700],['ddr',700,1030],['ussr',1030,1380]];
+const eras=[[60,385,'1920–1935 · Avantgarde'],[385,600,'1935–1955 · Emigration, Krieg, Stalinismus'],[600,940,'1955–1990 · Nachkriegsmoderne'],[940,1200,'seit 1990 · Fortschreibung: Sanierung, Umbau, Rückbau']];
+const g0=el('g');
+cols.forEach(([r,x0,x1],i)=>{
+  el('rect',{x:x0,y:20,width:x1-x0,height:1180,fill:REG[r],opacity:.045},g0);
+  if(i) el('line',{x1:x0,y1:20,x2:x0,y2:1200,stroke:'var(--rule)','stroke-width':1},g0);
+  const t=el('text',{x:x0+12,y:44,class:'band-label',fill:REG[r]},g0);t.textContent=REGNAME[r];
+});
+eras.forEach(([y0,y1,l],i)=>{
+  if(i) el('line',{x1:20,y1:y0,x2:1380,y2:y0,stroke:'var(--rule)','stroke-dasharray':'2 4'},g0);
+  const t=el('text',{x:1372,y:y1-10,class:'era-label','text-anchor':'end'},g0);t.textContent=l;
+});
+// Knotengrößen
+const W=n=>{const a=n.t.length*(n.kind==='hub'?9.2:7.1),b=(n.m+(n.folder?' · Ordner 00':'')).length*6.1;return Math.max(a,b)+24;};
+N.forEach(n=>{n.w=W(n);n.h=n.kind==='hub'?52:40;});
+// Kanten
+const ge=el('g'), edgeEls=[];
+E.forEach((e,i)=>{
+  const a=byId[e[0]],b=byId[e[1]];const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||1;
+  const off=(i%2?1:-1)*Math.min(60,len*.12);const cx=(a.x+b.x)/2-dy/len*off,cy=(a.y+b.y)/2+dx/len*off;
+  const d=`M${a.x},${a.y} Q${cx},${cy} ${b.x},${b.y}`;
+  const g=el('g',{'data-type':e[2]},ge);
+  el('path',{d,class:'edge '+e[2]},g);
+  const h=el('path',{d,class:'hit'},g);const tt=el('title',{},h);tt.textContent=`${a.t} ↔ ${b.t}: ${e[3]}`;
+  edgeEls.push({g,e});
+});
+// Knoten
+const gn=el('g'), nodeEls={};
+N.forEach(n=>{
+  const g=el('g',{class:'node '+n.kind,transform:`translate(${n.x-n.w/2},${n.y-n.h/2})`,tabindex:0,role:'button','aria-label':n.t+', '+n.m},gn);
+  el('rect',{width:n.w,height:n.h,rx:n.kind==='person'?n.h/2:2,stroke:n.kind==='person'?'var(--ink)':REG[n.reg]},g);
+  const t1=el('text',{x:n.kind==='person'?16:11,y:n.kind==='hub'?23:17,class:'t1'},g);t1.textContent=n.t;
+  const t2=el('text',{x:n.kind==='person'?16:11,y:n.kind==='hub'?40:31,class:'t2'},g);
+  t2.textContent=n.m+(n.folder?' · Ordner '+n.folder.slice(0,2):'');
+  g.addEventListener('click',()=>select(n.id));
+  g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();select(n.id);}});
+  nodeEls[n.id]=g;
+});
+// Filter
+const active={doc:true,vgl:true,ctx:true};
+document.querySelectorAll('.chip[data-type]').forEach(c=>c.addEventListener('click',()=>{
+  const t=c.dataset.type;active[t]=!active[t];c.setAttribute('aria-pressed',active[t]);applyFilter();refresh();
+}));
+function applyFilter(){edgeEls.forEach(({g,e})=>g.classList.toggle('hidden',!active[e[2]]));}
+const typeName={doc:'Belegter Bezug',vgl:'Formaler Vergleich',ctx:'Ort / Kontext'};
+const lineSvg=t=>`<svg viewBox="0 0 28 10" aria-label="${typeName[t]}"><line x1="0" y1="5" x2="28" y2="5" class="edge ${t}"/></svg>`;
+let current=null, pair=null;
+function refresh(){ if(pair) selectPair(...pair,false); else if(current) select(current,false); }
+function clearDim(){Object.values(nodeEls).forEach(g=>g.classList.remove('dimmed','sel'));edgeEls.forEach(({g})=>g.classList.remove('dimmed'));}
+function select(id,scroll=true){
+  current=id;pair=null;clearDim();const n=byId[id];
+  const rel=E.filter(e=>active[e[2]]&&(e[0]===id||e[1]===id));const nb=new Set([id,...rel.flatMap(e=>[e[0],e[1]])]);
+  Object.entries(nodeEls).forEach(([k,g])=>g.classList.toggle('dimmed',!nb.has(k)));
+  nodeEls[id].classList.add('sel');
+  edgeEls.forEach(({g,e})=>g.classList.toggle('dimmed',!(e[0]===id||e[1]===id)));
+  const order={doc:0,vgl:1,ctx:2};rel.sort((a,b)=>order[a[2]]-order[b[2]]);
+  panel.innerHTML=`<span class="tag" style="color:${n.kind==='person'?'var(--ink)':REG[n.reg]}">${n.kind==='person'?'Person':n.kind==='event'?'Ereignis / Kontext':n.kind==='hub'?'Zentrum':'Projekt'} · ${REGNAME[n.reg]}</span>
+   <h2>${n.t}</h2><div class="meta"><span>${n.m}</span></div><p>${n.d}</p>
+   ${n.folder?`<div><div class="small">Bilder im Ordner</div><div class="folder">${n.folder}</div></div>`:''}
+   <div class="small">Bildquelle: ${n.src}</div>
+   <div><div class="small" style="margin-bottom:6px">Verbindungen (${rel.length})</div><ul class="rels">${rel.map(e=>{const o=e[0]===id?e[1]:e[0];return `<li>${lineSvg(e[2])}<span><button data-go="${o}">${byId[o].t}</button><br><span class="small">${e[3]}</span></span></li>`}).join('')||'<li class="small">Keine sichtbaren Verbindungen mit dem aktuellen Filter.</li>'}</ul></div>`;
+  panel.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.go)));
+}
+function selectPair(a,b,code,scroll=true){
+  pair=[a,b,code];current=null;clearDim();
+  Object.entries(nodeEls).forEach(([k,g])=>g.classList.toggle('dimmed',k!==a&&k!==b));
+  nodeEls[a].classList.add('sel');nodeEls[b].classList.add('sel');
+  edgeEls.forEach(({g,e})=>g.classList.toggle('dimmed',!((e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a))));
+  const e=E.find(x=>x[4]===code),c=CARDS[code];
+  panel.innerHTML=`<span class="tag" style="color:var(--ussr)">Gegenüberstellung ${code}</span><h2>${byId[a].t} ↔ ${byId[b].t}</h2>
+   <div class="meta"><span>${byId[a].m}</span><span>${byId[b].m}</span></div>
+   <p><strong>${e[3].replace(/^[A-E] · /,'')}</strong></p><p>${c.q}</p><div class="small">Art des Bezugs: ${c.b}</div>
+   <ul class="rels"><li>${lineSvg('vgl')}<span><button data-go="${a}">${byId[a].t}</button></span></li><li>${lineSvg('vgl')}<span><button data-go="${b}">${byId[b].t}</button></span></li></ul>`;
+  panel.querySelectorAll('[data-go]').forEach(x=>x.addEventListener('click',()=>select(x.dataset.go)));
+  if(scroll) document.querySelector('.layout').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
+const panel=document.getElementById('panel');
+function intro(){current=null;pair=null;clearDim();
+  const c={doc:0,vgl:0,ctx:0};E.forEach(e=>c[e[2]]++);
+  panel.innerHTML=`<span class="tag" style="color:var(--muted)">Übersicht</span><h2>Leitfrage</h2>
+  <p>Gab es zwischen 1920 und 1990 eine gemeinsame Moderne in West und Ost, oder nur ähnliche Formen? Die Karte trennt deshalb nachweisbare Verbindungen von formalen Ähnlichkeiten.</p>
+  <ul class="rels"><li>${lineSvg('doc')}<span>${c.doc} belegte Bezüge: Bauten, Ämter, Mitarbeit, Programme</span></li>
+  <li>${lineSvg('vgl')}<span>${c.vgl} formale Vergleiche, davon A–E aus der Quellenliste</span></li>
+  <li>${lineSvg('ctx')}<span>${c.ctx} Orts- und Kontextbezüge</span></li></ul>
+  <p class="small">Drei Brücken tragen die Argumentation: Hannes Meyer (Bauhaus → UdSSR), Richard Paulick (Bauhaus → DDR → Schwedt) und Chruschtschows Wende 1954 (UdSSR → industrieller Wohnungsbau der DDR).</p>
+  <p class="small">Projekt anklicken für Details, Bildordner und alle Verbindungen.</p>`;}
+document.getElementById('reset').addEventListener('click',intro);
+intro();
+// Karten
+const cards=document.getElementById('cards');
+E.filter(e=>e[4]).forEach(e=>{const c=CARDS[e[4]];const b=document.createElement('button');b.className='card';b.type='button';
+  b.innerHTML=`<span class="tag" style="color:var(--ussr);justify-self:start">${e[4]}${'ABCDE'.includes(e[4])?' · aus Quellenliste':' · Ergänzung'}</span>
+  <div class="pair">${byId[e[0]].t} <span>↔</span> ${byId[e[1]].t}</div><div class="q">${c.q}</div><div class="src">${c.b}</div>`;
+  b.addEventListener('click',()=>selectPair(e[0],e[1],e[4]));cards.appendChild(b);});
+// Quellen
+const srcs=document.getElementById('srcs');
+SRCS.forEach(([t,u,d])=>{const li=document.createElement('li');li.innerHTML=u==='#'?`<strong>${t}</strong><span class="small">${d}</span>`:`<a href="${u}" target="_blank" rel="noopener">${t}</a><span class="small">${d}</span>`;srcs.appendChild(li);});
+</script>
+
+</body>
+</html>
